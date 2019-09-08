@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+
+    <string name="error_message">Something went wrong getting your movies.</string>
+    <!-- Menu Strings -->
+    <string name="sort_by_popular">Sort By Most Popular</string>
+    <string name="sort_by_rating">Sort By Highest Rating</string>
+    <string name="load">Load More</string>
+</resources>
