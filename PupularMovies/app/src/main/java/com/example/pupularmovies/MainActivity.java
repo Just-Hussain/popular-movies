@@ -3,6 +3,7 @@ package com.example.pupularmovies;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,13 +50,24 @@ public class MainActivity extends AppCompatActivity
 
         moviesAdapter = new MoviesAdapter(this);
 
-        rvMoviesList.setLayoutManager(new GridLayoutManager(this, 3));
+        rvMoviesList.setLayoutManager(new GridLayoutManager(this, numberOfColumns()));
 
         rvMoviesList.setHasFixedSize(true);
 
         rvMoviesList.setAdapter(moviesAdapter);
 
-        loadData();
+        loadData("popular");
+    }
+
+    private int numberOfColumns() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        // You can change this divider to adjust the size of the item
+        int widthDivider = 328;
+        int width = displayMetrics.widthPixels;
+        int nColumns = width / widthDivider;
+        if (nColumns < 2) return 2; //to keep the grid aspect
+        return nColumns;
     }
 
     @Override
@@ -72,12 +84,14 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.action_sort) {
             if (sortFlag) {
-                Arrays.sort(moviesAdapter.getMovies(), new Comparator<Movie>() {
-                    @Override
-                    public int compare(Movie movie, Movie t1) {
-                        return (int) (t1.getPopularity() - movie.getPopularity());
-                    }
-                });
+//                Arrays.sort(moviesAdapter.getMovies(), new Comparator<Movie>() {
+//                    @Override
+//                    public int compare(Movie movie, Movie t1) {
+//                        return (int) (t1.getPopularity() - movie.getPopularity());
+//                    }
+//                });
+                moviesAdapter.setMovies(null);
+                loadData("popular");
 
                 moviesAdapter.notifyDataSetChanged();
                 item.setTitle(R.string.sort_by_rating);
@@ -85,12 +99,15 @@ public class MainActivity extends AppCompatActivity
                 sortFlag = false;
             }
             else {
-                Arrays.sort(moviesAdapter.getMovies(), new Comparator<Movie>() {
-                    @Override
-                    public int compare(Movie movie, Movie t1) {
-                        return (int) (t1.getVoteAvg() - movie.getVoteAvg());
-                    }
-                });
+//                Arrays.sort(moviesAdapter.getMovies(), new Comparator<Movie>() {
+//                    @Override
+//                    public int compare(Movie movie, Movie t1) {
+//                        return (int) (t1.getVoteAvg() - movie.getVoteAvg());
+//                    }
+//                });
+                moviesAdapter.setMovies(null);
+                loadData("top_rated");
+
                 moviesAdapter.notifyDataSetChanged();
                 item.setTitle(R.string.sort_by_popular);
 
@@ -98,7 +115,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
         else if (id == R.id.action_load) {
-            loadData();
+            if (sortFlag)
+                loadData("popular");
+            else
+                loadData("top_rated");
         }
 
         return super.onOptionsItemSelected(item);
@@ -113,8 +133,8 @@ public class MainActivity extends AppCompatActivity
         startActivity(intentDetails);
     }
 
-    void loadData() {
-        URL url = NetworkUtils.buildUrl(loadedPages);
+    void loadData(String sort) {
+        URL url = NetworkUtils.buildUrl(loadedPages, sort);
         loadedPages++;
         new TMDbQueryTask().execute(url);
     }
