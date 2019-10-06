@@ -6,4 +6,12 @@
     <string name="sort_by_popular">Sort By Most Popular</string>
     <string name="sort_by_rating">Sort By Highest Rating</string>
     <string name="load">Load More</string>
+    <string name="author">Author: </string>
+    <string name="reviews_tag">Reviews</string>
+    <string name="trailers_tag">Trailers</string>
+    <string name="add_favorites">Add To Favorites</string>
+    <string name="remove_favorites">Remove From Favorites</string>
+    <string name="show_fav">Show Favorites</string>
+
+
 </resources>

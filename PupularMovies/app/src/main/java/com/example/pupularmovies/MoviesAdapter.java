@@ -1,22 +1,26 @@
 package com.example.pupularmovies;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pupularmovies.models.FavoriteMovie;
 import com.example.pupularmovies.models.Movie;
 import com.example.pupularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {
 
     private static Movie[] movies;
-
     private final ListItemClickListener onClickListener;
 
     public MoviesAdapter(ListItemClickListener listener) {
@@ -29,10 +33,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         return movies;
     }
 
+
     public void setMovies(Movie[] movies) {
         MoviesAdapter.movies = movies;
         notifyDataSetChanged();
     }
+
+
 
     @NonNull
     @Override

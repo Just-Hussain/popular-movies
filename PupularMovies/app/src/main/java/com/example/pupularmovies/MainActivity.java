@@ -1,12 +1,16 @@
 package com.example.pupularmovies;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -14,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pupularmovies.models.FavoriteMovie;
 import com.example.pupularmovies.models.Movie;
 import com.example.pupularmovies.utilities.JsonUtils;
 import com.example.pupularmovies.utilities.NetworkUtils;
@@ -22,6 +27,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,6 +35,9 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements MoviesAdapter.ListItemClickListener {
 
+    Context context = this;
+
+    private FavoriteDatabase db = null;
 
     public static int loadedPages = 1;
 
@@ -38,6 +47,8 @@ public class MainActivity extends AppCompatActivity
     ProgressBar pbLoadingIndicator;
     @BindView(R.id.tv_error_message)
     TextView tvErrorMessage;
+    @BindView(R.id.ll_favs)
+    LinearLayout llFavs;
 
     private MoviesAdapter moviesAdapter;
 
@@ -48,6 +59,16 @@ public class MainActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
+        db = FavoriteDatabase.getInstance(context);
+
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                db.favoriteDao().delete();
+//            }
+//        }.start();
+
+
         moviesAdapter = new MoviesAdapter(this);
 
         rvMoviesList.setLayoutManager(new GridLayoutManager(this, numberOfColumns()));
@@ -57,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         rvMoviesList.setAdapter(moviesAdapter);
 
         loadData("popular");
+
     }
 
     private int numberOfColumns() {
@@ -81,15 +103,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        llFavs.removeAllViews();
 
         if (id == R.id.action_sort) {
             if (sortFlag) {
-//                Arrays.sort(moviesAdapter.getMovies(), new Comparator<Movie>() {
-//                    @Override
-//                    public int compare(Movie movie, Movie t1) {
-//                        return (int) (t1.getPopularity() - movie.getPopularity());
-//                    }
-//                });
+
                 moviesAdapter.setMovies(null);
                 loadData("popular");
 
@@ -99,12 +117,6 @@ public class MainActivity extends AppCompatActivity
                 sortFlag = false;
             }
             else {
-//                Arrays.sort(moviesAdapter.getMovies(), new Comparator<Movie>() {
-//                    @Override
-//                    public int compare(Movie movie, Movie t1) {
-//                        return (int) (t1.getVoteAvg() - movie.getVoteAvg());
-//                    }
-//                });
                 moviesAdapter.setMovies(null);
                 loadData("top_rated");
 
@@ -119,6 +131,24 @@ public class MainActivity extends AppCompatActivity
                 loadData("popular");
             else
                 loadData("top_rated");
+        }
+        else if (id == R.id.action_fav) {
+            moviesAdapter.setMovies(null);
+            moviesAdapter.notifyDataSetChanged();
+            new Thread() {
+                @Override
+                public void run() {
+                    List<FavoriteMovie> list = db.favoriteDao().getFavoriteList();
+                    for (int i = 0; i < list.size(); i++) {
+                        TextView textView = new TextView(context);
+                        textView.setText(list.get(i).getName());
+                        textView.setPadding(10, 10, 10, 10);
+                        textView.setTextSize(20);
+                        textView.setTextColor(Color.WHITE);
+                        llFavs.addView(textView);
+                    }
+                }
+            }.start();
         }
 
         return super.onOptionsItemSelected(item);

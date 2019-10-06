@@ -37,4 +37,10 @@ dependencies {
     //RecyclerView for better UI/UX.
     implementation 'com.android.support:recyclerview-v7:28.0.0'
 
+
+    //To mange data using Room.
+    def room_version = "2.2.0-rc01"
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 }

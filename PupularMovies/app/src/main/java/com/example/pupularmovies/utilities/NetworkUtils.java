@@ -15,6 +15,8 @@ public class NetworkUtils {
     static final String BASE_POPULAR_URL = "https://api.themoviedb.org/3/movie/popular";
     static final String BASE_RATED_URL = "https://api.themoviedb.org/3/movie/top_rated";
 
+//    static  final String BASE_REVIEW_URL = ""
+
     public static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/";
 
     public static final String BASE_IMG_SIZE = "w342";
@@ -23,6 +25,40 @@ public class NetworkUtils {
 
     static final String PARAM_PAGE = "page";
 
+    static final String PARAM_REVIEWS = "/reviews";
+    static final String PARAM_VIDEOS = "/videos";
+
+    public static URL buildReviewsUrl(int id) {
+        Uri buildUri = Uri.parse(BASE_URL + id + PARAM_REVIEWS).buildUpon()
+                .appendQueryParameter(PARAM_KEY, "<api_key>")
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(buildUri.toString());
+        }
+        catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    public static URL buildVideoUrl(int id) {
+        Uri buildUri = Uri.parse(BASE_URL + id + PARAM_VIDEOS).buildUpon()
+                .appendQueryParameter(PARAM_KEY, "c6c533d22a663fca314c58769bce4e4d")
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(buildUri.toString());
+        }
+        catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
 
     public static URL buildUrl(int page, String sort) {
         if (sort == null)

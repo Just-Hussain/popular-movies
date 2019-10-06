@@ -20,6 +20,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:id="@+id/ll_favs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </ScrollView>
     <TextView
         android:id="@+id/tv_error_message"
         android:textSize="22sp"
