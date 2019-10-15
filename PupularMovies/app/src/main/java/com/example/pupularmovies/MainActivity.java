@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity
     LinearLayout llFavs;
 
     private MoviesAdapter moviesAdapter;
+    private List<TextView> favViews = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         rvMoviesList.setAdapter(moviesAdapter);
 
         loadData("popular");
-
+        retrieveFavMovies();
     }
 
     private int numberOfColumns() {
@@ -135,25 +140,32 @@ public class MainActivity extends AppCompatActivity
         else if (id == R.id.action_fav) {
             moviesAdapter.setMovies(null);
             moviesAdapter.notifyDataSetChanged();
-            new Thread() {
-                @Override
-                public void run() {
-                    List<FavoriteMovie> list = db.favoriteDao().getFavoriteList();
-                    for (int i = 0; i < list.size(); i++) {
-                        TextView textView = new TextView(context);
-                        textView.setText(list.get(i).getName());
-                        textView.setPadding(10, 10, 10, 10);
-                        textView.setTextSize(20);
-                        textView.setTextColor(Color.WHITE);
-                        llFavs.addView(textView);
-                    }
-                }
-            }.start();
+
+            for (int i = 0; i < favViews.size(); i++)
+                llFavs.addView(favViews.get(i));
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void retrieveFavMovies() {
+        final LiveData<List<FavoriteMovie>> list = db.favoriteDao().getFavoriteList();
+        list.observe(this, new Observer<List<FavoriteMovie>>() {
+            @Override
+            public void onChanged(List<FavoriteMovie> favoriteMovies) {
+                favViews = new LinkedList<>();
+                for (int i = 0; i < favoriteMovies.size(); i++) {
+                    TextView textView = new TextView(context);
+                    textView.setText(favoriteMovies.get(i).getName());
+                    textView.setPadding(10, 10, 10, 10);
+                    textView.setTextSize(20);
+                    textView.setTextColor(Color.WHITE);
+//                    llFavs.addView(textView);
+                    favViews.add(textView);
+                }
+            }
+        });
+    }
     @Override
     public void onListItemClick(int clickedItemIndex) {
         Intent intentDetails = new Intent(MainActivity.this, DetailsActivity.class);
