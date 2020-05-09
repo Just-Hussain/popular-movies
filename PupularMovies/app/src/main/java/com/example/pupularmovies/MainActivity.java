@@ -6,17 +6,14 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -83,7 +80,26 @@ public class MainActivity extends AppCompatActivity
         rvMoviesList.setAdapter(moviesAdapter);
 
         loadData("popular");
-        retrieveFavMovies();
+
+//        retrieveFavMovies();
+
+
+        FavViewModel favViewModel = new FavViewModel(db);
+        favViewModel.getFavs().observe(this, new Observer<List<FavoriteMovie>>() {
+            @Override
+            public void onChanged(List<FavoriteMovie> favoriteMovies) {
+                favViews = new LinkedList<>();
+                for (int i = 0; i < favoriteMovies.size(); i++) {
+                    TextView textView = new TextView(context);
+                    textView.setText(favoriteMovies.get(i).getName());
+                    textView.setPadding(10, 10, 10, 10);
+                    textView.setTextSize(20);
+                    textView.setTextColor(Color.WHITE);
+//                    llFavs.addView(textView);
+                    favViews.add(textView);
+                }
+            }
+        });
     }
 
     private int numberOfColumns() {
@@ -148,24 +164,25 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void retrieveFavMovies() {
-        final LiveData<List<FavoriteMovie>> list = db.favoriteDao().getFavoriteList();
-        list.observe(this, new Observer<List<FavoriteMovie>>() {
-            @Override
-            public void onChanged(List<FavoriteMovie> favoriteMovies) {
-                favViews = new LinkedList<>();
-                for (int i = 0; i < favoriteMovies.size(); i++) {
-                    TextView textView = new TextView(context);
-                    textView.setText(favoriteMovies.get(i).getName());
-                    textView.setPadding(10, 10, 10, 10);
-                    textView.setTextSize(20);
-                    textView.setTextColor(Color.WHITE);
-//                    llFavs.addView(textView);
-                    favViews.add(textView);
-                }
-            }
-        });
-    }
+//    private void retrieveFavMovies() {
+//        final LiveData<List<FavoriteMovie>> list = db.favoriteDao().getFavoriteList();
+//        list.observe(this, new Observer<List<FavoriteMovie>>() {
+//            @Override
+//            public void onChanged(List<FavoriteMovie> favoriteMovies) {
+//                favViews = new LinkedList<>();
+//                for (int i = 0; i < favoriteMovies.size(); i++) {
+//                    TextView textView = new TextView(context);
+//                    textView.setText(favoriteMovies.get(i).getName());
+//                    textView.setPadding(10, 10, 10, 10);
+//                    textView.setTextSize(20);
+//                    textView.setTextColor(Color.WHITE);
+////                    llFavs.addView(textView);
+//                    favViews.add(textView);
+//                }
+//            }
+//        });
+//    }
+
     @Override
     public void onListItemClick(int clickedItemIndex) {
         Intent intentDetails = new Intent(MainActivity.this, DetailsActivity.class);
